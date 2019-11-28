@@ -1,4 +1,4 @@
-import {otherRouter, appRouter} from '@/router/router'
+import { otherRouter, appRouter } from 'app/router/router'
 import Util from '@/libs/util'
 import store from '@/store'
 
@@ -18,10 +18,10 @@ const app = {
       otherRouter,
       ...appRouter
     ],
-    lastRoute: undefined,
+    lastRoute: undefined
   },
   mutations: {
-    updateMenulist(state) {
+    updateMenulist (state) {
       const accessCode = store.getters.roles
       const menuList = []
       appRouter.forEach((item, index) => {
@@ -71,9 +71,9 @@ const app = {
       })
       state.menuList = menuList
     },
-    addOpenSubmenu(state, name) {
-      let hasThisName = false;
-      let isEmpty = false;
+    addOpenSubmenu (state, name) {
+      let hasThisName = false
+      let isEmpty = false
       if (name.length === 0) {
         isEmpty = true
       }
@@ -84,17 +84,17 @@ const app = {
         state.openedSubmenuArr.push(name)
       }
     },
-    setCurrentPath(state, pathArr) {
+    setCurrentPath (state, pathArr) {
       state.currentPath = pathArr
     },
-    setCurrentPageName(state, name) {
+    setCurrentPageName (state, name) {
       state.currentPageName = name
     },
-    clearOpenedSubmenu(state) {
+    clearOpenedSubmenu (state) {
       state.openedSubmenuArr.length = 0
     },
-    updateLastRoute(state, route){
-      state.lastRoute = route;
+    updateLastRoute (state, route) {
+      state.lastRoute = route
     }
   }
 }

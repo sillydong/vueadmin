@@ -3,27 +3,42 @@
 </style>
 <template>
   <div class="app-container">
-
-      <div class="filter-container">
-        <el-button type="warning" :loading="checking" @click="check">检查并删除无效路由</el-button>
-        <el-button type="primary" @click="getlist">刷新路由</el-button>
-      </div>
-    <div class="">
-      <el-transfer :data="availables" v-model="assigned" :titles="titles"
-                   @change="transfer"></el-transfer>
+    <div class="filter-container">
+      <el-button
+        :loading="checking"
+        type="warning"
+        @click="check"
+      >
+        检查并删除无效路由
+      </el-button>
+      <el-button
+        type="primary"
+        @click="getlist"
+      >
+        刷新路由
+      </el-button>
     </div>
-
+    <div class="">
+      <el-transfer
+        v-model="assigned"
+        :data="availables"
+        :titles="titles"
+        @change="transfer"
+      />
+    </div>
   </div>
 </template>
 
 <script>
 // import { mapState, mapActions, mapMutations } from 'vuex';
-import { routes, route_check, route_add, route_delete } from '@/api/rbac'
+import { routes, route_check, route_add, route_delete } from 'app/api/rbac'
 
 export default {
   name: 'admin_route',
   components: {},
-  data() {
+  directives: {},
+  filters: {},
+  data () {
     return {
       titles: [
         '未绑定路由',
@@ -35,16 +50,23 @@ export default {
     }
   },
   computed: {},
+  watch: {},
+  created () {
+    this.getlist()
+  },
+  mounted () {
+  },
   methods: {
-    getlist() {
+    getlist () {
       routes().then(response => {
         this.availables = response.data.availables
         this.assigned = response.data.assigned
       })
         .catch(err => {
+          console.log(err)
         })
     },
-    transfer(targetKeys, direction, moveKeys) {
+    transfer (targetKeys, direction, moveKeys) {
       if (moveKeys.length > 0) {
         if (direction === 'left') {
           // 删除
@@ -52,19 +74,19 @@ export default {
             this.assigned = targetKeys
             //                            this.assigned.push(response.data)
           }).catch(err => {
-
+            console.log(err)
           })
         } else if (direction === 'right') {
           // 添加
           route_add(moveKeys).then(response => {
             this.assigned = targetKeys
           }).catch(err => {
-
+            console.log(err)
           })
         }
       }
     },
-    check() {
+    check () {
       this.checking = true
       route_check().then(response => {
         this.checking = false
@@ -85,17 +107,10 @@ export default {
           })
         }
       }).catch(err => {
+        console.log(err)
         this.checking = false
       })
     }
-  },
-  watch: {},
-  directives: {},
-  filters: {},
-  created() {
-    this.getlist()
-  },
-  mounted() {
   }
 }
 </script>

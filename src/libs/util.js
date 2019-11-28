@@ -22,10 +22,17 @@ util.oneLike = function (ele, targetArr) {
   if (targetArr.indexOf(ele) >= 0) {
     return true
   }
+  if (ele.slice(-1) === '*') {
+    ele = ele.substr(0, ele.length - 1)
+  }
   for (const item of targetArr) {
     if (item.slice(-1) === '*') {
       const len = item.length - 1
       if (item.substr(0, len) === ele.substr(0, len)) {
+        return true
+      }
+    } else {
+      if (item.indexOf(ele) === 0) {
         return true
       }
     }
@@ -75,52 +82,51 @@ util.handleTitle = function (vm, item) {
 }
 
 util.setCurrentPath = function (vm, name) {
-  console.log(name);
-  let title = '';
-  let isOtherRouter = false;
-  let currentPathObj;
-  let childObj;
-  let isFirst = false;
+  let title = ''
+  let isOtherRouter = false
+  let currentPathObj
+  let childObj
+  let isFirst = false
   item:
-      for (let item of vm.$store.state.app.routers) {
-        if (item.children.length === 1) {
-          if (item.children[0].name === name) {
-            title = util.handleTitle(vm, item);
+  for (let item of vm.$store.state.app.routers) {
+    if (item.children.length === 1) {
+      if (item.children[0].name === name) {
+        title = util.handleTitle(vm, item)
+        if (item.name === 'otherRouter') {
+          isOtherRouter = true
+        }
+        currentPathObj = item
+        childObj = item.children[0]
+        isFirst = true
+        break
+      }
+    } else {
+      if (item.name === name) {
+        currentPathObj = item
+        childObj = item.children[0]
+        isFirst = true
+        break
+      } else {
+        let i = 0
+        for (let child of item.children) {
+          if (child.name === name) {
+            title = util.handleTitle(vm, child)
             if (item.name === 'otherRouter') {
               isOtherRouter = true
             }
-            currentPathObj = item;
-            childObj = item.children[0];
-            isFirst = true;
-            break;
-          }
-        } else {
-          if (item.name === name) {
-            currentPathObj = item;
-            childObj = item.children[0];
-            isFirst = true;
-            break;
-          } else {
-            let i = 0;
-            for (let child of item.children) {
-              if (child.name === name) {
-                title = util.handleTitle(vm, child)
-                if (item.name === 'otherRouter') {
-                  isOtherRouter = true
-                }
-                currentPathObj = item;
-                childObj = child;
-                if (i === 0) {
-                  isFirst = true;
-                }
-                break item;
-              }
-              i++;
+            currentPathObj = item
+            childObj = child
+            if (i === 0) {
+              isFirst = true
             }
+            break item
           }
+          i++
         }
       }
-  let currentPathArr = [];
+    }
+  }
+  let currentPathArr = []
   if (name === 'home_index') {
     currentPathArr = [
       {
@@ -129,17 +135,23 @@ util.setCurrentPath = function (vm, name) {
         name: 'home_index'
       }
     ]
-  } else if ((name.indexOf('_index') >= 0 || isOtherRouter) && name
-      !== 'home_index') {
+  } else if ((name.indexOf('_index') >= 0 || isOtherRouter) && name !==
+      'home_index') {
     if (isOtherRouter) {
-      console.log(currentPathObj)
-      currentPathArr = vm.$store.state.app.currentPath;
-      currentPathArr.push({
-        title: title,
-        path: currentPathObj.path + childObj.path,
-        name: name
-      })
-      console.log(currentPathArr)
+      currentPathArr = vm.$store.state.app.currentPath
+      if (currentPathArr[currentPathArr.length - 1].name === name) {
+        currentPathArr[currentPathArr.length - 1] = {
+          title: title,
+          path: currentPathObj.path + childObj.path,
+          name: name
+        }
+      } else {
+        currentPathArr.push({
+          title: title,
+          path: currentPathObj.path + childObj.path,
+          name: name
+        })
+      }
     } else {
       currentPathArr = [
         {
@@ -155,8 +167,8 @@ util.setCurrentPath = function (vm, name) {
       ]
     }
   } else {
-    if (currentPathObj.children.length <= 1 && currentPathObj.name
-        === 'home_index') {
+    if (currentPathObj.children.length <= 1 && currentPathObj.name ===
+        'home_index') {
       currentPathArr = [
         {
           title: '概览',
@@ -164,8 +176,8 @@ util.setCurrentPath = function (vm, name) {
           name: 'home_index'
         }
       ]
-    } else if (currentPathObj.children.length <= 1 && currentPathObj.name
-        !== 'home_index') {
+    } else if (currentPathObj.children.length <= 1 && currentPathObj.name !==
+        'home_index') {
       currentPathArr = [
         {
           title: '概览',
@@ -212,8 +224,8 @@ util.toDefaultPage = function (routers, name, route, next) {
   let i = 0
   let notHandle = true
   while (i < len) {
-    if (routers[i].name === name && routers[i].children && routers[i].redirect
-        === undefined) {
+    if (routers[i].name === name && routers[i].children && routers[i].redirect ===
+        undefined) {
       route.replace({
         name: routers[i].children[0].name
       })
@@ -236,7 +248,16 @@ util.canAccess = function (requestAccess, vm) {
   if (util.oneOf('admin', userAccess)) {
     return true
   }
-  return util.oneLike(requestAccess, userAccess)
+  if (Array.isArray(requestAccess)) {
+    for (const item of requestAccess) {
+      if (!util.oneLike(item, userAccess)) {
+        return false
+      }
+    }
+    return true
+  } else {
+    return util.oneLike(requestAccess, userAccess)
+  }
 }
 
 export default util

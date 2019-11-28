@@ -5,25 +5,25 @@
 const path = require('path')
 
 module.exports = {
-  dev: {
+  dev_admin: {
 
     // Paths
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
       '/admin': {
-        target: "http://xxx.localhost.com",
+        target: 'http://api.domain.com',
         changeOrigin: true,
         logLevel: 'debug',
         pathRewrite: {
           '^/admin': '/admin'
         }
-      },
+      }
     },
 
     // Various Dev Server settings
     host: 'localhost', // can be overwritten by process.env.HOST
-    port: 10008, // can be overwritten by process.env.PORT, if port is in use, a free one will be determined
+    port: 10009, // can be overwritten by process.env.PORT, if port is in use, a free one will be determined
     autoOpenBrowser: false,
     errorOverlay: true,
     notifyOnErrors: true,
@@ -51,15 +51,14 @@ module.exports = {
 
     cssSourceMap: false
   },
-
-  build: {
+  build_admin: {
     // Template for index.html
-    index: path.resolve(__dirname, '../dist/index.html'),
+    index: path.resolve(__dirname, '../build/index.html'),
 
     // Paths
-    assetsRoot: path.resolve(__dirname, '../dist'),
-    assetsSubDirectory: 'static',
-    assetsPublicPath: '/', //CDN域名
+    assetsRoot: path.resolve(__dirname, '../build'),
+    assetsSubDirectory: 'statics',
+    assetsPublicPath: '/', // CDN域名
 
     /**
      * Source Maps

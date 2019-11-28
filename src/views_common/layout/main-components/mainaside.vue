@@ -28,13 +28,13 @@
     .el-menu {
       border: 0;
       background-color: inherit;
-      color: #9ea7b4;
+      color: #bfcbd9;
       .is-active .el-submenu__title .layout-text {
         color: #FFFFFF;
       }
       .el-menu-item, .el-submenu__title {
         background: inherit;
-        color: #9ea7b4;
+        color: #bfcbd9;
         &:hover {
           background-color: #409eff;
           color: #ffffff;
@@ -66,28 +66,61 @@
 <template>
   <div class="mainaside">
     <div class="header">
-      <span v-show="!shrink" class="long">管理后台</span>
-      <span v-show="shrink" class="short">后台</span>
+      <span
+        v-show="!shrink"
+        class="long"
+      >管理后台</span>
+      <span
+        v-show="shrink"
+        class="short"
+      >后台</span>
     </div>
-    <el-menu ref="mainaside" :collapse="shrink" :default-active="$route.name" @select="handleChange"
-             mode="vertical" :unique-opened="true">
+    <el-menu
+      ref="mainaside"
+      :collapse="shrink"
+      :default-active="$route.name"
+      :unique-opened="true"
+      mode="vertical"
+      @select="handleChange"
+    >
       <template v-for="item in menuList">
-        <el-menu-item v-if="item.children.length<=1" class="rootitem" :name="item.children[0].name"
-                      :index="item.children[0].name" :key="'menuitem' + item.name">
-          <i :class="item.icon"></i>
-          <span slot="title" class="layout-text"
-                :key="'title' + item.name">{{ item.meta.title }}</span>
+        <el-menu-item
+          v-if="item.children.length<=1"
+          :key="'menuitem' + item.name"
+          :name="item.children[0].name"
+          :index="item.children[0].name"
+          class="rootitem"
+        >
+          <i :class="item.icon" />
+          <span
+            slot="title"
+            :key="'title' + item.name"
+            class="layout-text"
+          >{{ item.meta.title }}</span>
         </el-menu-item>
 
-        <el-submenu v-if="item.children.length > 1" class="rootitem" :name="item.name"
-                    :key="item.name" :index="item.name">
+        <el-submenu
+          v-if="item.children.length > 1"
+          :key="item.name"
+          :name="item.name"
+          :index="item.name"
+          class="rootitem"
+        >
           <template slot="title">
-            <i :class="item.icon"></i>
+            <i :class="item.icon" />
             <span class="layout-text">{{ item.meta.title }}</span>
           </template>
           <template v-for="child in item.children">
-            <el-menu-item :index="child.name" :name="child.name" :key="'menuitem' + child.name">
-              <span slot="title" class="layout-text" :key="'title' + child.name">{{ child.meta.title }}</span>
+            <el-menu-item
+              :key="'menuitem' + child.name"
+              :index="child.name"
+              :name="child.name"
+            >
+              <span
+                slot="title"
+                :key="'title' + child.name"
+                class="layout-text"
+              >{{ child.meta.title }}</span>
             </el-menu-item>
           </template>
         </el-submenu>
@@ -97,39 +130,40 @@
 </template>
 
 <script>
-  export default {
-    name: 'mainaside',
-    components: {},
-    props: {
-      shrink: {
-        type: Boolean,
-        default: false
-      },
-      menuList: {
-        type: Array,
-        required: true
-      },
-      beforePush: {
-        type: Function
-      },
+export default {
+  name: 'mainaside',
+  components: {},
+  props: {
+    shrink: {
+      type: Boolean,
+      default: false
     },
-    computed: {
+    menuList: {
+      type: Array,
+      required: true
     },
-    methods: {
-      handleChange(name) {
-        let willpush = true
-        if (this.beforePush !== undefined) {
-          if (!this.beforePush(name)) {
-            willpush = false
-          }
+    beforePush: {
+      type: Function,
+      default: undefined
+    }
+  },
+  computed: {
+  },
+  methods: {
+    handleChange (name) {
+      let willpush = true
+      if (this.beforePush !== undefined) {
+        if (!this.beforePush(name)) {
+          willpush = false
         }
-        if (willpush) {
-          this.$router.push({
-            name: name
-          })
-        }
-        this.$emit('on-change', name)
       }
+      if (willpush) {
+        this.$router.push({
+          name: name
+        })
+      }
+      this.$emit('on-change', name)
     }
   }
+}
 </script>

@@ -1,6 +1,6 @@
 import axios from 'axios'
 import * as qs from 'qs'
-import { router } from '@/router/index'
+import { router } from 'app/router/index'
 import NProgress from 'nprogress'
 import { Message } from 'element-ui'
 import store from '@/store'
@@ -89,7 +89,7 @@ service.interceptors.response.use(
   }
 )
 
-export function get(url, params) {
+export function get (url, params) {
   return new Promise((resolve, reject) => {
     service.get(url, { params: params }).then(response => {
       resolve(response.data)
@@ -101,7 +101,7 @@ export function get(url, params) {
   })
 }
 
-export function post(url, params) {
+export function post (url, params) {
   return new Promise((resolve, reject) => {
     service.post(url, params).then(response => {
       resolve(response.data)

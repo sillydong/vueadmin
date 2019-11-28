@@ -1,5 +1,5 @@
 import { getToken, setToken, removeToken } from '@/libs/token'
-import { login, logout, info } from '@/api/account'
+import { login, logout, info } from 'app/api/account'
 
 const user = {
   state: {
@@ -29,7 +29,7 @@ const user = {
     }
   },
   actions: {
-    login({ commit }, form) {
+    login ({ commit }, form) {
       return new Promise((resolve, reject) => {
         login(form).then(response => {
           setToken(response.data.token)
@@ -41,7 +41,7 @@ const user = {
         })
       })
     },
-    info({ commit }) {
+    info ({ commit }) {
       return new Promise((resolve, reject) => {
         info().then(response => {
           commit('SET_STATE', response.data)
@@ -51,12 +51,11 @@ const user = {
         })
       })
     },
-    logout({ commit }) {
+    logout ({ commit }) {
       return new Promise((resolve, reject) => {
         logout().then(response => {
           removeToken()
           commit('CLEAN_STATE')
-          commit('clearAllTags')
           commit('clearOpenedSubmenu')
           resolve(response)
         }).catch(err => {
@@ -64,7 +63,7 @@ const user = {
         })
       })
     },
-    clean({ commit }) {
+    clean ({ commit }) {
       return new Promise((resolve) => {
         removeToken()
         commit('CLEAN_STATE')

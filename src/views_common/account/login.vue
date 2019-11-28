@@ -27,38 +27,78 @@
             }
         }
     }
+    .copyright{
+      color: white;
+      position:absolute;
+      width: 100%;
+      bottom:0;
+      height:24px;
+      font-size: 13px;
+      text-align: center;
+    }
 </style>
 
 <template>
-    <div class="login" @keydown.enter="handleSubmit">
-        <div class="login-con">
-            <el-card :bordered="false">
-                <div slot="header">
-                    <i class="el-icon-ic-key-o"></i>
-                    欢迎登录管理后台
-                </div>
-                <div class="form-con">
-                    <el-form ref="loginForm" :model="form" :rules="rules">
-                        <el-form-item prop="username">
-                            <el-input v-model="form.username" placeholder="请输入用户名" :autofocus="true" prefix-icon="el-icon-ic-user-o"></el-input>
-                        </el-form-item>
-                        <el-form-item prop="password">
-                            <el-input type="password" v-model="form.password" placeholder="请输入密码" prefix-icon="el-icon-ic-lock-o"></el-input>
-                        </el-form-item>
-                        <el-form-item>
-                            <el-button @click="handleSubmit" :tabindex="0" :loading="form.loading" type="primary" long>登录</el-button>
-                        </el-form-item>
-                    </el-form>
-                </div>
-            </el-card>
+  <div
+    class="login"
+    @keydown.enter="handleSubmit"
+  >
+    <div class="login-con">
+      <el-card :bordered="false">
+        <div slot="header">
+          <i class="el-icon-ic-key-o" />
+          欢迎登录管理后台
         </div>
+        <div class="form-con">
+          <el-form
+            ref="loginForm"
+            :model="form"
+            :rules="rules"
+          >
+            <el-form-item prop="username">
+              <el-input
+                v-model="form.username"
+                :autofocus="true"
+                placeholder="请输入用户名"
+                prefix-icon="el-icon-ic-user-o"
+              />
+            </el-form-item>
+            <el-form-item prop="password">
+              <el-input
+                v-model="form.password"
+                type="password"
+                placeholder="请输入密码"
+                prefix-icon="el-icon-ic-lock-o"
+              />
+            </el-form-item>
+            <el-form-item>
+              <el-button
+                :tabindex="0"
+                :loading="form.loading"
+                type="primary"
+                long
+                @click="handleSubmit"
+              >
+                登录
+              </el-button>
+            </el-form-item>
+          </el-form>
+        </div>
+      </el-card>
     </div>
+    <div class="copyright">
+      © <a
+        href="http://www.dongwutec.com"
+        target="_blank"
+      >常州市东吴网络科技有限公司</a>
+    </div>
+  </div>
 </template>
 
 <script>
 export default {
   name: 'login',
-  data() {
+  data () {
     return {
       form: {
         username: '',
@@ -76,7 +116,7 @@ export default {
     }
   },
   methods: {
-    handleSubmit() {
+    handleSubmit () {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
@@ -86,6 +126,7 @@ export default {
               name: 'home_index'
             })
           }).catch(err => {
+            console.log(err)
             this.loading = false
           })
         } else {

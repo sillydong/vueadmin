@@ -4,7 +4,7 @@
 }
 
 .el-transfer{
-  font-size: 14px;
+  font-size: 12px;
   .el-transfer-panel{
     width: 40%;
     height: 500px;
@@ -32,8 +32,8 @@
   width: 100%;
   max-width: 100%;
   background-color: #fff;
-  font-size: 14px;
-  color: #5a5e66
+  font-size: 12px;
+  color: #1c2438;
 }
 
 .el-table__empty-block {
@@ -88,11 +88,20 @@
 }
 
 .el-table__expanded-cell[class*=cell] {
-  padding: 20px 50px
+  padding: 5px 50px
 }
 
 .el-table__expanded-cell:hover {
   background-color: #f5f7fa !important
+}
+
+.el-table__expanded-cell .el-form{
+  font-size: 12px;
+  color: #1c2438;
+  &-item {
+    margin-bottom: 0;
+    min-width: 18%;
+  }
 }
 
 .el-table--fit {
@@ -163,7 +172,7 @@
 }
 
 .el-table--mini {
-  font-size: 12px
+  font-size: 14px
 }
 
 .el-table--mini td, .el-table--mini th {
@@ -259,6 +268,27 @@
 .el-table .cell.el-tooltip {
   white-space: nowrap;
   min-width: 50px
+}
+
+.el-table .cell a {
+  text-decoration: underline;
+}
+
+.el-table .cell{
+  .el-button + .el-button{
+    margin-left: 3px !important;
+  }
+  .el-button-group {
+    .el-button + .el-button{
+      margin-left: 0 !important;
+    }
+  }
+  a + a{
+    margin-left: 3px !important;
+  }
+  a + .el-button{
+    margin-left: 3px !important;
+  }
 }
 
 .el-table td:first-child .cell, .el-table th:first-child .cell {
@@ -447,7 +477,7 @@
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
-  height: 13px;
+  height: 34px;
   width: 24px;
   cursor: pointer;
   overflow: initial
@@ -455,9 +485,12 @@
 
 .el-table .sort-caret {
   color: #0a76a4;
-  width: 14px;
   overflow: hidden;
-  font-size: 13px
+  width: 0;
+  height: 0;
+  border: 5px solid transparent;
+  position: absolute;
+  left: 7px;
 }
 
 .el-table .ascending .sort-caret.ascending {
@@ -517,15 +550,27 @@
 
 .el-form{
   color: #5a5e66;
-  font-size: 14px;
-  .el-radio,.el-checkbox,.el-checkbox-group,.el-input,.el-input-number,.el-select,.el-cascader,.el-switch,.el-slider,.el-time-picker,.el-date-picker,.el-date-time-picker,.el-rate,.el-color-picker{
-    font-size: 12px !important;
-    vertical-align: middle;
-    &__label{
+  font-size: 12px;
+  &-item{
+    margin-bottom: 22px;
+    &-item__label{
+      font-size: 12px;
+    }
+    &-item__content{
+      font-size: 12px;
+    }
+    .el-radio,.el-checkbox,.el-checkbox-group,.el-input,.el-input-number,.el-select,.el-cascader,.el-switch,.el-slider,.el-time-picker,.el-date-picker,.el-date-time-picker,.el-rate,.el-color-picker{
       font-size: 12px !important;
-      * {
+      vertical-align: middle;
+      &__label{
         font-size: 12px !important;
+        * {
+          font-size: 12px !important;
+        }
       }
+    }
+    .el-input__inner {
+      line-height: 12px !important;
     }
   }
   .buttons{
@@ -560,4 +605,12 @@
   .popper__arrow{
     display: none;
   }
+}
+
+.filter-item.el-cascader--small{
+  line-height: 31px !important;
+}
+
+.el-row+.el-row{
+  margin-top: 10px;
 }
