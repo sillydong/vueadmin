@@ -14,7 +14,7 @@ const user = {
       state.id = data.id
       state.username = data.username
       state.nickname = data.nickname
-      state.roles = data.roles
+      state.roles = data.roles || []
     },
     SET_TOKEN: (state, token) => {
       state.token = token
