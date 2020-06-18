@@ -31,7 +31,7 @@
 
 <script>
 // import { mapState, mapActions, mapMutations } from 'vuex';
-import { routes, route_check, route_add, route_delete } from 'app/api/rbac'
+import { routes, route_check, route_add, route_delete } from '@/api/rbac'
 
 export default {
   name: 'admin_route',

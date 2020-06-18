@@ -165,7 +165,7 @@
 
 <script>
 // import { mapState, mapActions, mapMutations } from 'vuex';
-import { permissions, permission_create, permission_update, permission_delete } from 'app/api/rbac'
+import { permissions, permission_create, permission_update, permission_delete } from '@/api/rbac'
 
 export default {
   name: 'admin_permission',

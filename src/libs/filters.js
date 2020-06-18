@@ -1,9 +1,15 @@
-export function parseImage (url) {
-  return process.env.imageUrl + url
+const filters = {}
+
+filters.qiniuImage = (url) => {
+  return process.env.imageUrl + '/' + url
 }
 
-export function qiniuThumbImage (url, domain = true) {
-  return (domain ? process.env.imageUrl : '') + url + '?imageView2/1/w/100/h/100'
+filters.qiniuThumb = (url, size = 100) => {
+  return process.env.imageUrl + '/' + url + '?imageView2/1/w/' + size + '/h/' + size
+}
+
+filters.price = (val, coefficient = 100) => {
+  return val / coefficient
 }
 
 function pluralize (time, label) {
@@ -13,7 +19,7 @@ function pluralize (time, label) {
   return time + label + 's'
 }
 
-export function timeAgo (time) {
+filters.timeAgo = (time) => {
   const between = Date.now() / 1000 - Number(time)
   if (between < 3600) {
     return pluralize(~~(between / 60), ' minute')
@@ -24,17 +30,9 @@ export function timeAgo (time) {
   }
 }
 
-export function parseTime (time, cFormat) {
-  if (arguments.length === 0) {
-    return null
-  }
-
-  if (time === 0 || time === '' || time === '0') {
+filters.time = (time, cFormat) => {
+  if (time === 0 || time === '' || time === '0' || time === null) {
     return '无'
-  }
-
-  if ((time + '').length === 10) {
-    time = +time * 1000
   }
 
   const format = cFormat || '{y}-{m}-{d} {h}:{i}:{s}'
@@ -42,7 +40,7 @@ export function parseTime (time, cFormat) {
   if (typeof time === 'object') {
     date = time
   } else {
-    date = new Date(parseInt(time))
+    date = new Date(time)
   }
   const formatObj = {
     y: date.getFullYear(),
@@ -66,8 +64,7 @@ export function parseTime (time, cFormat) {
   return time_str
 }
 
-export function formatTime (time, option) {
-  time = +time * 1000
+filters.timePrettify = (time, option) => {
   const d = new Date(time)
   const now = Date.now()
 
@@ -83,14 +80,13 @@ export function formatTime (time, option) {
     return '1天前'
   }
   if (option) {
-    return parseTime(time, option)
+    return this.time(time, option)
   } else {
     return d.getMonth() + 1 + '月' + d.getDate() + '日' + d.getHours() + '时' + d.getMinutes() + '分'
   }
 }
 
-/* 数字 格式化 */
-export function nFormatter (num, digits) {
+filters.bytesPrettify = (num, digits) => {
   const si = [
     { value: 1E18, symbol: 'E' },
     { value: 1E15, symbol: 'P' },
@@ -107,22 +103,13 @@ export function nFormatter (num, digits) {
   return num.toString()
 }
 
-export function html2Text (val) {
-  const div = document.createElement('div')
-  div.innerHTML = val
-  return div.textContent || div.innerText
-}
-
-export function toThousandslsFilter (num) {
-  return (+num || 0).toString().replace(/^-?\d+/g, m => m.replace(/(?=(?!\b)(\d{3})+$)/g, ','))
-}
-
-export function join (arr, sep) {
+filters.join = (arr, sep) => {
+  if (arr == null) return ''
   sep = sep || ','
   return arr.join(sep)
 }
 
-export function joinfield (arr, field, sep) {
+filters.joinfield = (arr, field, sep) => {
   sep = sep || ','
   const datas = []
   for (const item of arr) {
@@ -131,10 +118,23 @@ export function joinfield (arr, field, sep) {
   return datas.join(sep)
 }
 
-export function value (id, arr, field) {
+filters.arrayValue = (id, arr, field) => {
   for (const item of arr) {
     if (item['id'] === id) {
       return item[field]
     }
   }
 }
+
+filters.value = (obj, field, defaultVal) => {
+  if (obj == null) {
+    return defaultVal
+  }
+  return obj[field]
+}
+
+filters.map = (val, map) => {
+  return map[val] === undefined ? val : map[val]
+}
+
+export default filters

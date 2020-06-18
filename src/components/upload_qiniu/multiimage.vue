@@ -40,10 +40,7 @@
 </template>
 
 <script>
-import { qiniu_image, persistent } from 'app/api/upload'
-
-function noop () {
-}
+import { qiniu_image } from '@/api/upload'
 
 export default {
   name: 'multiimage',
@@ -69,43 +66,31 @@ export default {
     limit: {
       type: Number,
       default: 0
-    },
-    onRemove: {
-      type: Function,
-      default: noop
-    },
-    onSuccess: {
-      type: Function,
-      default: noop
     }
   },
   data () {
     return {
-      filelist: [],
       preview: false,
       preview_url: '',
-      dataObj: { token: '', key: '' },
+      dataObj: { token: '' },
       xtmpfiles: [],
-      uploaded: 0,
-      uploading: false
+      updatable: true
     }
   },
   computed: {
-  },
-  watch: {
-    value (val) {
-      if (!this.uploading) {
-        this.uploaded = val.length
-        this.xtmpfiles = []
-        this.filelist = []
+    filelist () {
+      if (this.updatable) {
         const _self = this
-        if (val !== null) {
-          val.forEach(function (item) {
-            _self.filelist.push({ name: item.url, url: _self.baseurl + item.url, id: item.id })
-            _self.xtmpfiles.push({ name: item.url, url: item.url, id: item.id })
-          })
-        }
+        _self.xtmpfiles = []
+        _self.value.forEach(function (item) {
+          if (item.startsWith(_self.baseurl)) {
+            _self.xtmpfiles.push({ url: item })
+          } else {
+            _self.xtmpfiles.push({ url: _self.baseurl + item })
+          }
+        })
       }
+      return this.xtmpfiles
     }
   },
   methods: {
@@ -114,51 +99,28 @@ export default {
       this.preview = true
     },
     handleRemove (file, fileList) {
-      const _self = this
-      let currentkey = ''
-      if (file.response !== undefined) {
-        currentkey = file.response.key
-      } else {
-        currentkey = file.name
-      }
-      this.xtmpfiles.forEach(function (item, index) {
-        if (item.url.indexOf(currentkey) >= 0) {
-          _self.uploaded--
-          _self.xtmpfiles.splice(index, 1)
-          _self.onRemove(item)
-          return true
-        }
-      })
+      this.updatable = true
+      const value = fileList.map(v => v.url)
+      this.$emit('input', value)
     },
     handleSuccess (res, file, fileList) {
-      this.uploaded++
-      this.xtmpfiles.push({ name: file.name, url: '/' + res.key, id: file.uid })
-      let persistentId = res.persistentId
-      if (persistentId !== undefined && persistentId !== null) {
-        persistent(persistentId).then(resp => {
-          if (this.uploaded === fileList.length) {
-            this.$emit('input', this.xtmpfiles)
-          }
-          this.onSuccess('/' + res.key)
-        }).catch(err => {
-          console.log(err)
-          if (this.uploaded === fileList.length) {
-            this.$emit('input', this.xtmpfiles)
-          }
-          this.onSuccess('/' + res.key)
-        })
-      } else {
-        if (this.uploaded === fileList.length) {
-          this.$emit('input', this.xtmpfiles)
-        }
-        this.onSuccess('/' + res.key)
+      if (this.value == null) {
+        this.value = []
       }
+      if (fileList.length === this.value.length + 1) {
+        this.updatable = true
+      } else {
+        this.updatable = false
+      }
+      const url = '/' + res.key
+      this.$emit('input', [...this.value, url])
     },
     handleError (err, file, fileList) {
       console.log(err)
-      this.uploaded++
-      if (this.uploaded === fileList.length) {
-        this.uploading = false
+      if (fileList.length === this.value.length + 1) {
+        this.updatable = true
+      } else {
+        this.updatable = false
       }
     },
     beforeUpload (file) {
@@ -167,7 +129,6 @@ export default {
       return new Promise((resolve, reject) => {
         qiniu_image(_self.prefix, file.name, 1).then(response => {
           _self._data.dataObj.token = response.data.token
-          _self._data.dataObj.key = response.data.key
           resolve(true)
         }).catch(err => {
           reject(err)

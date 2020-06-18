@@ -11,7 +11,7 @@ import '@/styles/element.less'
 import '@/styles/iconfont.less'
 import '@/styles/styles.less'
 // import '@/styles/fontawesome.less'
-import * as filters from '@/filters'
+import filters from '@/libs/filters'
 import util from '@/libs/util'
 
 Vue.use(Element, {

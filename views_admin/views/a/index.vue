@@ -4,7 +4,7 @@
 
 <script>
 export default {
-  name: 'home_index',
+  name: 'a_index',
   components: { },
   data () {
     return {}

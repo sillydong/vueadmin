@@ -8,7 +8,7 @@
         label-width="100px"
         label-position="left"
       >
-        <el-form-item label="昵称：">
+        <el-form-item label="商家：">
           <el-input
             v-model="nickname"
             :disabled="true"
@@ -70,7 +70,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { profile } from 'app/api/account'
+import { profile } from '@/api/account'
 
 export default {
   name: 'profile',

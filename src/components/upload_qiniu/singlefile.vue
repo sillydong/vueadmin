@@ -40,7 +40,7 @@
 </template>
 
 <script>
-import { qiniu_file } from 'app/api/upload'
+import { qiniu_file } from '@/api/upload'
 
 export default {
   name: 'singlefile',
@@ -64,12 +64,12 @@ export default {
   },
   data () {
     return {
-      dataObj: { token: '', key: '' }
+      dataObj: { token: '' }
     }
   },
   computed: {
     filelist () {
-      if (this.value !== '') {
+      if (this.value != null && this.value !== '') {
         return [{ name: this.value, url: this.baseurl + this.value }]
       }
       return []
@@ -102,7 +102,6 @@ export default {
       return new Promise((resolve, reject) => {
         qiniu_file(_self.prefix, file.name).then(response => {
           _self._data.dataObj.token = response.data.token
-          _self._data.dataObj.key = response.data.key
           resolve(true)
         }).catch(err => {
           reject(err)

@@ -1,5 +1,5 @@
 import axios from 'axios'
-import * as qs from 'qs'
+// import * as qs from 'qs'
 import { router } from 'app/router/index'
 import NProgress from 'nprogress'
 import { Message } from 'element-ui'
@@ -17,9 +17,15 @@ service.interceptors.request.use((config) => {
   if (store.getters.token !== undefined && store.getters.token !== '') {
     config.headers['Authorization'] = 'Bearer ' + store.getters.token
   }
-  config.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
-  if (config.method === 'post') {
-    config.data = qs.stringify(config.data)
+  // if (config.method === 'post' || config.method === 'put') {
+  //   config.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
+  //   config.headers.put['Content-Type'] = 'application/x-www-form-urlencoded'
+  //   config.data = qs.stringify(config.data)
+  // }
+  if (config.method === 'post' || config.method === 'put') {
+    config.headers.post['Content-Type'] = 'application/json'
+    config.headers.put['Content-Type'] = 'application/json'
+    config.data = JSON.stringify(config.data)
   }
   return config
 }, (error) => {
@@ -36,63 +42,73 @@ service.interceptors.request.use((config) => {
 service.interceptors.response.use(
   (response) => {
     NProgress.done()
-    const status = response.data.status
-    // 50014:Token 过期了 50012:其他客户端登录了 50008:非法的token
-    if (status === 0) {
-      return response
-    } else if (status === 401) {
+    return response
+  }, error => {
+    NProgress.done()
+    if (error.response === undefined) {
       Message({
-        message: '未登录',
+        message: '[' + error.code + ']' + error.message,
         type: 'error',
         duration: 2 * 1000
       })
-      // // 登出
-      store.dispatch('clean').then(() => {
-        store.commit('clearOpenedSubmenu')
-        router.push({ path: '/login' })
-      })
     } else {
-      const err = response.data.error
-      switch (typeof (err)) {
-        case 'string':
+      let status = error.response.status
+      switch (status) {
+        case 400:
+          let code = error.response.data.code
+          let message = ''
+          if (code === 4001) {
+            let msg = []
+            error.response.data.data.forEach(field => {
+              msg.push(field.field_name + ' ' + field.error)
+            })
+            message = msg.join(', ')
+          } else {
+            message = '[' + error.response.data.code + ']' + error.response.data.message
+          }
           Message({
-            message: err,
+            message: message,
             type: 'error',
             duration: 2 * 1000
           })
           break
-        case 'object':
-        case 'array':
+        case 401:
+        case 403:
           Message({
-            message: Object.values(err).join(),
+            message: error.response.data.message,
+            type: 'error',
+            duration: 2 * 1000
+          })
+          store.dispatch('clean').then(() => {
+            store.commit('clearOpenedSubmenu')
+            router.push({ path: '/login' })
+          })
+          break
+        case 500:
+          Message({
+            message: '[' + error.response.data.code + ']' + error.response.data.message,
+            type: 'error',
+            duration: 2 * 1000
+          })
+          break
+        default:
+          Message({
+            message: '[' + error.response.status + ']' + error.response.data.message,
             type: 'error',
             duration: 2 * 1000
           })
           break
       }
-      return Promise.reject(response)
     }
-  }, error => {
-    NProgress.done()
-    Message({
-      message: error.message,
-      type: 'error',
-      duration: 2 * 1000
-    })
-    if (error.response.status === 401) {
-      store.dispatch('clean').then(() => {
-        store.commit('clearOpenedSubmenu')
-        router.push({ path: '/login' })
-      })
-    }
+
     return Promise.reject(error)
   }
 )
 
-export function get (url, params) {
+export function doGet (url, params) {
   return new Promise((resolve, reject) => {
     service.get(url, { params: params }).then(response => {
-      resolve(response.data)
+      resolve(response)
     }, err => {
       reject(err)
     }).catch((error) => {
@@ -101,10 +117,34 @@ export function get (url, params) {
   })
 }
 
-export function post (url, params) {
+export function doPost (url, params) {
   return new Promise((resolve, reject) => {
     service.post(url, params).then(response => {
-      resolve(response.data)
+      resolve(response)
+    }, err => {
+      reject(err)
+    }).catch((error) => {
+      reject(error)
+    })
+  })
+}
+
+export function doPut (url, params) {
+  return new Promise((resolve, reject) => {
+    service.put(url, params).then(response => {
+      resolve(response)
+    }, err => {
+      reject(err)
+    }).catch((error) => {
+      reject(error)
+    })
+  })
+}
+
+export function doDelete (url, params) {
+  return new Promise((resolve, reject) => {
+    service.delete(url, params).then(response => {
+      resolve(response)
     }, err => {
       reject(err)
     }).catch((error) => {

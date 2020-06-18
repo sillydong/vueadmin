@@ -1,5 +1,5 @@
 import { getToken, setToken, removeToken } from '@/libs/token'
-import { login, logout, info } from 'app/api/account'
+import { login, logout, info } from '@/api/account'
 
 const user = {
   state: {
@@ -14,7 +14,11 @@ const user = {
       state.id = data.id
       state.username = data.username
       state.nickname = data.nickname
-      state.roles = data.roles || []
+      if (data.roles === undefined) {
+        state.roles = undefined
+      } else {
+        state.roles = data.roles || []
+      }
     },
     SET_TOKEN: (state, token) => {
       state.token = token

@@ -4,7 +4,6 @@
     transition: padding .3s;
     .header {
       height: 50px;
-      background: #f0f0f0;
       /*box-shadow: 0 2px 1px 1px rgba(100, 100, 100, .1);*/
       vertical-align: middle;
       &-navicon-con {
@@ -48,6 +47,7 @@
               overflow: hidden;
               text-overflow: ellipsis;
               text-align: right;
+              margin-right: 16px;
             }
           }
           &-innercon {
@@ -95,6 +95,7 @@
             class="user-dropdown-innercon"
           >
             <el-dropdown
+              v-if="enableProfile || enableLogout"
               transfer
               trigger="hover"
               @command="handleClickUserDropdown"
@@ -103,11 +104,17 @@
                 <i class="el-icon-ic-user-o" />
                 <span class="main-user-name">{{ nickname }}</span>
               </a>
-              <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item command="profile">
+              <el-dropdown-menu
+                slot="dropdown"
+              >
+                <el-dropdown-item
+                  v-if="enableProfile"
+                  command="profile"
+                >
                   个人中心
                 </el-dropdown-item>
                 <el-dropdown-item
+                  v-if="enableLogout"
                   command="loginout"
                   divided
                 >
@@ -115,6 +122,17 @@
                 </el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
+            <div
+              v-else
+              class="el-dropdown"
+            >
+              <a
+                href="javascript:void(0)"
+              >
+                <i class="el-icon-ic-user-o" />
+                <span class="main-user-name">{{ nickname }}</span>
+              </a>
+            </div>
           </el-row>
         </div>
       </div>
@@ -140,6 +158,14 @@ export default {
     toggleMenu: {
       type: Function,
       default: noop
+    },
+    enableProfile: {
+      type: Boolean,
+      default: true
+    },
+    enableLogout: {
+      type: Boolean,
+      default: true
     }
   },
   computed: {

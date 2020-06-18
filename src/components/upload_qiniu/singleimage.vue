@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import { qiniu_image } from 'app/api/upload'
+import { qiniu_image } from '@/api/upload'
 
 export default {
   name: 'singleimage',
@@ -68,12 +68,12 @@ export default {
     return {
       preview: false,
       preview_url: '',
-      dataObj: { token: '', key: '' }
+      dataObj: { token: '' }
     }
   },
   computed: {
     filelist () {
-      if (this.value !== '') {
+      if (this.value != null && this.value !== '') {
         return [{ name: '', url: this.baseurl + this.value }]
       }
       return []
@@ -107,7 +107,6 @@ export default {
       return new Promise((resolve, reject) => {
         qiniu_image(_self.prefix, file.name, 0).then(response => {
           _self._data.dataObj.token = response.data.token
-          _self._data.dataObj.key = response.data.key
           resolve(true)
         }).catch(err => {
           reject(err)

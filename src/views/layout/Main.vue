@@ -1,32 +1,43 @@
 <style scoped lang="less">
   .main {
+    min-width: 600px;
     width: 100%;
     height: 100%;
     .el-header {
       padding: 0;
+      background-color: #ffffff;
+      border-bottom: 1px solid #dcdcdc;
     }
     .el-main {
       margin: 0;
       padding: 10px;
-      background-color: #ffffff;
+      background-color: #f0f0f0;
       .app-container {
         padding: 10px;
+        background-color: #ffffff;
+        min-height: 100%;
       }
     }
     .el-footer{
       width: 100%;
       height:24px !important;
       font-size: 13px;
-      background: white;
       vertical-align: middle;
       color: #606266;
     }
+  }
+  @media (max-width: 600px) {
+    /* For tablets: */
+    .el-aside.close {display: none;}
   }
 </style>
 
 <template>
   <el-container class="main">
-    <el-aside :width="shrink?'64px':'220px'">
+    <el-aside
+      :width="shrink?'64px':'220px'"
+      :class="shrink?'close':'open'"
+    >
       <mainaside
         :shrink="shrink"
         :menu-list="menuList"
@@ -37,6 +48,8 @@
         <mainheader
           :shrink="shrink"
           :toggle-menu="toggleClick"
+          :enable-profile="enableProfile"
+          :enable-logout="enableLogout"
         />
       </el-header>
       <el-main>
@@ -66,7 +79,9 @@ export default {
   },
   data () {
     return {
-      shrink: false
+      shrink: false,
+      enableProfile: false,
+      enableLogout: false
     }
   },
   computed: {

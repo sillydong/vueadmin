@@ -1,4 +1,4 @@
-import Main from '@/views_common/layout/Main.vue'
+import Main from '@/views/layout/Main.vue'
 
 // 不作为Main组件的子页面展示的页面单独写，如下
 export const loginRouter = {
@@ -8,7 +8,7 @@ export const loginRouter = {
     title: 'Login - 登录'
   },
   component: resolve => {
-    require(['@/views_common/account/login.vue'], resolve)
+    require(['@/views/account/login.vue'], resolve)
   }
 }
 
@@ -19,7 +19,7 @@ export const page404 = {
     title: '404-页面不存在'
   },
   component: resolve => {
-    require(['@/views_common/error/404.vue'], resolve)
+    require(['@/views/error/404.vue'], resolve)
   }
 }
 
@@ -30,7 +30,7 @@ export const page403 = {
   },
   name: 'error-403',
   component: resolve => {
-    require(['@/views_common/error/403.vue'], resolve)
+    require(['@/views/error/403.vue'], resolve)
   }
 }
 
@@ -41,7 +41,7 @@ export const page500 = {
   },
   name: 'error-500',
   component: resolve => {
-    require(['@/views_common/error/500.vue'], resolve)
+    require(['@/views/error/500.vue'], resolve)
   }
 }
 
@@ -69,7 +69,7 @@ export const otherRouter = {
       },
       name: 'profile',
       component: resolve => {
-        require(['@/views_common/account/profile.vue'], resolve)
+        require(['@/views/account/profile.vue'], resolve)
       }
     }
   ]
@@ -77,7 +77,48 @@ export const otherRouter = {
 
 // 作为Main组件的子页面展示并且在左侧菜单显示的路由写在appRouter里
 export const appRouter = [
-  // TODO
+  {
+    path: '/a',
+    icon: 'el-icon-ic-jibao_o',
+    name: 'a',
+    meta: {
+      title: 'AAAA'
+    },
+    component: Main,
+    children: [
+      {
+        path: 'index',
+        meta: {
+          title: 'AAAAA'
+        },
+        name: 'a_index',
+        component: resolve => {
+          require(['app/views/a/index.vue'], resolve)
+        }
+      }
+    ]
+  },
+  {
+    path: '/b',
+    icon: 'el-icon-ic-gouwuche_o',
+    name: 'b',
+    meta: {
+      title: 'BBBB'
+    },
+    component: Main,
+    children: [
+      {
+        path: 'index',
+        meta: {
+          title: 'BBBBB'
+        },
+        name: 'b_index',
+        component: resolve => {
+          require(['@/views/default/empty.vue'], resolve)
+        }
+      }
+    ]
+  }
 ]
 
 // 所有上面定义的路由都要写在下面的routers里

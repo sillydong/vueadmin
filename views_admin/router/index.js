@@ -31,7 +31,8 @@ router.beforeEach((to, from, next) => {
       name: 'home_index'
     })
   } else {
-    if (store.getters.roles.length === 0) {
+    // roles为undefined的话不启用权限判断
+    if (store.getters.roles !== undefined && store.getters.roles.length === 0) {
       store.dispatch('info').then(response => {
         // 权限菜单过滤相关
         // store.commit('updateMenulist');
@@ -61,7 +62,7 @@ router.beforeEach((to, from, next) => {
       })
     } else {
       const curRouterObj = Util.getRouterObjByName([otherRouter, ...appRouter], to.name)
-      if (curRouterObj && curRouterObj.access !== undefined) { // 需要判断权限的路由
+      if (curRouterObj && curRouterObj.access !== undefined && store.getters.roles !== undefined) { // 需要判断权限的路由
         if (Util.showThisRoute(curRouterObj.access, store.getters.roles)) {
           store.commit('updateLastRoute', from)
           Util.toDefaultPage([otherRouter, ...appRouter], to.name, router, next) // 如果在地址栏输入的是一级菜单则默认打开其第一个二级菜单的页面

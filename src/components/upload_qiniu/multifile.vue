@@ -38,7 +38,7 @@
 </template>
 
 <script>
-import { qiniu_file } from 'app/api/upload'
+import { qiniu_file } from '@/api/upload'
 
 function noop () {
 }
@@ -83,7 +83,7 @@ export default {
       files: [],
       preview: false,
       preview_url: '',
-      dataObj: { token: '', key: '' }
+      dataObj: { token: '' }
     }
   },
   computed: {
@@ -143,7 +143,6 @@ export default {
       return new Promise((resolve, reject) => {
         qiniu_file(_self.prefix, file.name, 0).then(response => {
           _self._data.dataObj.token = response.data.token
-          _self._data.dataObj.key = response.data.key
           resolve(true)
         }).catch(err => {
           reject(err)

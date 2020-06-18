@@ -1,12 +1,14 @@
-<style scoped>
-
+<style scoped lang="less">
+  .el-checkbox-group .el-checkbox {
+    margin-left: 0;
+    width: 33%;
+  }
 </style>
 <template>
   <div class="app-container">
     <div class="filter-container">
       <el-button
         type="primary"
-        class="filter-item"
         @click="action_create()"
       >
         添加
@@ -17,37 +19,42 @@
         v-loading.body="table.loading"
         :data="table.items"
         border
-
         fit
         highlight-current-row
       >
         <el-table-column
-          prop="id"
+          prop="name"
           align="left"
-          label="ID"
-          width="50"
+          label="角色名称"
+          width="150"
         />
         <el-table-column
-          prop="skey"
+          prop="description"
           align="left"
-          label="键名"
-          width="100"
+          label="角色描述"
+          width="150"
         />
         <el-table-column
-          prop="smark"
           align="left"
-          label="说明"
-          width="100"
-        />
+          label="可操作权限"
+        >
+          <template slot-scope="scope">
+            <span>{{ scope.row.permissions.join(",") }}</span>
+          </template>
+        </el-table-column>
         <el-table-column
-          prop="svalue"
           align="left"
-          label="键值"
-        />
+          label="更新时间"
+          width="180"
+        >
+          <template slot-scope="scope">
+            <span>{{ scope.row.updatedAt | parseTime() }}</span>
+          </template>
+        </el-table-column>
         <el-table-column
           align="left"
           label="操作"
-          width="250"
+          width="200"
         >
           <template slot-scope="scope">
             <!-- 编辑 -->
@@ -92,29 +99,37 @@
         label-position="left"
       >
         <el-form-item
-          label="键名"
-          prop="skey"
+          label="角色名称"
+          prop="name"
         >
           <el-input
-            v-model="form.form.skey"
-            :disabled="form.action!='create'"
+            v-model="form.form.name"
+            :disabled="form.action=='update'"
+            placeholder="角色名称，仅英文"
           />
         </el-form-item>
         <el-form-item
-          label="说明"
-          prop="smark"
-        >
-          <el-input v-model="form.form.smark" />
-        </el-form-item>
-        <el-form-item
-          label="键值"
-          prop="svalue"
+          label="角色描述"
+          prop="description"
         >
           <el-input
-            v-model="form.form.svalue"
-            type="textarea"
-            rows="5"
+            v-model="form.form.description"
+            placeholder="角色描述"
           />
+        </el-form-item>
+        <el-form-item
+          label="可操作权限"
+          prop="data"
+        >
+          <el-checkbox-group v-model="form.form.permissions">
+            <el-checkbox
+              v-for="item in permissions"
+              :key="item.name"
+              :label="item.name"
+            >
+              {{ item.name }}
+            </el-checkbox>
+          </el-checkbox-group>
         </el-form-item>
       </el-form>
       <div
@@ -149,14 +164,15 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import { index, create, update, remove } from 'app/api/base'
+// import { mapState, mapActions, mapMutations } from 'vuex';
+import { roles, role_create, role_update, role_delete } from '@/api/rbac'
 
 export default {
-  name: 'settings_index',
+  name: 'admin_role',
   components: {},
   data () {
     return {
+      permissions: [],
       table: {
         query: {
           page: 1
@@ -168,12 +184,14 @@ export default {
       },
       form: {
         form: {
-          id: undefined,
-          skey: '',
-          smark: '',
-          svalue: ''
+          name: '',
+          description: '',
+          permissions: []
         },
         rules: {
+          name: [{ required: true, trigger: 'blur', message: '请输入角色名称' }],
+          description: [{ required: true, trigger: 'blur', message: '请输入角色描述' }],
+          permissions: [{ required: true, trigger: 'blur', message: '请选择可操作权限' }]
         },
         index: undefined,
         visible: false,
@@ -183,10 +201,7 @@ export default {
       }
     }
   },
-  computed: {
-    ...mapGetters([
-    ])
-  },
+  computed: {},
   watch: {
     '$route': 'fillquery'
   },
@@ -216,10 +231,11 @@ export default {
     },
     getlist () {
       this.table.loading = true
-      index('settings', this.table.query).then(response => {
-        this.table.items = response.data.list.items
-        this.table.total = response.data.list._meta.totalCount
-        this.table.perpage = response.data.list._meta.perPage
+      roles(this.table.query).then(response => {
+        this.table.items = response.data.roles
+        this.table.total = this.table.items.length
+        this.table.perpage = this.table.items.length
+        this.permissions = response.data.permissions
         this.table.loading = false
       }).catch(err => {
         console.log(err)
@@ -244,7 +260,7 @@ export default {
       this.$refs.form.validate(valid => {
         if (valid) {
           this.form.loading = true
-          create('settings', this.form.form).then(response => {
+          role_create(this.form.form).then(response => {
             this.table.items.unshift(response.data)
             this.form.visible = false
             this.$notify({
@@ -265,9 +281,8 @@ export default {
       this.$refs.form.validate(valid => {
         if (valid) {
           this.form.loading = true
-          update('settings', this.form.form.id, this.form.form).then(response => {
-            this.table.items.splice(this.form.index, 1,
-              Object.assign(this.table.items[this.form.index], response.data))
+          role_update(this.form.form.name, this.form.form).then(response => {
+            this.table.items.splice(this.form.index, 1, response.data)
             this.form.visible = false
             this.$notify({
               title: '成功',
@@ -285,7 +300,7 @@ export default {
     },
     do_delete (row, index) {
       if (confirm('确认删除?')) {
-        remove('settings', row.id).then(response => {
+        role_delete(row.name).then(response => {
           this.table.items.splice(index, 1)
           this.$notify({
             title: '成功',
@@ -304,10 +319,9 @@ export default {
       }
       if (row === undefined || row === null) {
         this.form.form = {
-          id: undefined,
-          skey: '',
-          smark: '',
-          svalue: ''
+          name: '',
+          description: '',
+          permissions: []
         }
       } else {
         this.form.form = Object.assign({}, row)
